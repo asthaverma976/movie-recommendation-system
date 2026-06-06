@@ -8,14 +8,6 @@ venv/
 env/
 .venv/
 
-# Model artifacts (generated at runtime)
-model/artifacts/
-*.pkl
-*.joblib
-
-# Generated data
-data/movies.csv
-
 # IDE
 .vscode/
 .idea/
