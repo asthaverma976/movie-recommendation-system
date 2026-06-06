@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Movies similar to {{ movie.title }} – powered by AI content-based filtering.">
+    <title>Recommendations for {{ movie.title }} – CineMatch</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+</head>
+<body>
+
+    <!-- ── Header ─────────────────────────────────────────────────────── -->
+    <header class="header">
+        <div class="container">
+            <a href="/" class="logo">
+                <span class="logo-icon">🎬</span>
+                <span>CineMatch</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/#featured">Featured</a></li>
+                <li><a href="/#search-area">Search</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="container" style="padding-top: 40px; padding-bottom: 40px;">
+
+        <!-- ── Back Button ────────────────────────────────────────────── -->
+        <a href="/" class="btn btn-secondary" style="margin-bottom: 32px;">
+            ← Back to Search
+        </a>
+
+        {% if movie %}
+        <!-- ── Selected Movie Hero ────────────────────────────────────── -->
+        <div class="rec-hero">
+            <div class="rec-hero-poster">
+                {% set primary_genre = movie.genres.split(',')[0].strip().lower().replace(' ', '-') %}
+                <div class="poster-gradient poster-{{ primary_genre }}">
+                    🎬
+                </div>
+            </div>
+            <div class="rec-hero-info">
+                <h2>{{ movie.title }}</h2>
+                <div class="rec-hero-meta">
+                    <span>📅 {{ movie.year }}</span>
+                    <span>⭐ {{ "%.1f" | format(movie.rating) }} / 10</span>
+                    <span class="director">🎬 {{ movie.director }}</span>
+                </div>
+                <div class="rec-hero-genres">
+                    {% for genre in movie.genres.split(',') %}
+                    <span class="genre-badge {{ genre.strip().lower().replace(' ', '-') }}">{{ genre.strip() }}</span>
+                    {% endfor %}
+                </div>
+                <p class="rec-hero-overview">{{ movie.overview }}</p>
+                <p class="rec-hero-cast"><strong>Cast:</strong> {{ movie.cast }}</p>
+            </div>
+        </div>
+
+        <!-- ── Recommendations Grid ───────────────────────────────────── -->
+        {% if recommendations %}
+        <div class="section-header">
+            <h2 class="section-title"><span class="icon">✨</span> Similar Movies</h2>
+            <span class="section-subtitle">{{ recommendations | length }} movies found</span>
+        </div>
+        <div class="movie-grid" id="rec-grid">
+            {% for rec in recommendations %}
+            <div class="movie-card fade-in-up" style="animation-delay: {{ loop.index0 * 0.06 }}s;" onclick="window.location.href='/recommend?movie_title={{ rec.title | urlencode }}'">
+                <!-- Similarity badge -->
+                <div class="similarity-badge">{{ "%.0f" | format(rec.similarity * 100) }}% match</div>
+
+                <!-- Poster -->
+                <div class="movie-poster">
+                    {% set rec_genre = rec.genres.split(',')[0].strip().lower().replace(' ', '-') %}
+                    <div class="poster-gradient poster-{{ rec_genre }}">
+                        🎬
+                        <span class="poster-year">{{ rec.year }}</span>
+                    </div>
+                </div>
+
+                <!-- Card body -->
+                <div class="movie-card-body">
+                    <div class="movie-card-title">{{ rec.title }}</div>
+                    <div class="movie-card-meta">
+                        <span class="year">{{ rec.year }}</span>
+                        <span class="rating">
+                            <!-- Star display -->
+                            <span class="stars">
+                                {% set full_stars = (rec.rating / 2) | int %}
+                                {% set half_star = ((rec.rating / 2) - full_stars) >= 0.3 %}
+                                {% for i in range(5) %}
+                                    {% if i < full_stars %}
+                                        <span>★</span>
+                                    {% elif i == full_stars and half_star %}
+                                        <span>★</span>
+                                    {% else %}
+                                        <span class="star-empty">★</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                            {{ "%.1f" | format(rec.rating) }}
+                        </span>
+                    </div>
+                    <div class="movie-card-genres">
+                        {% for genre in rec.genres.split(',')[:3] %}
+                        <span class="genre-badge {{ genre.strip().lower().replace(' ', '-') }}">{{ genre.strip() }}</span>
+                        {% endfor %}
+                    </div>
+                    <div style="margin-top: 8px; font-size: 0.78rem; color: var(--text-muted);">
+                        🎬 {{ rec.director }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-results">
+            <span class="icon">😔</span>
+            <h3>No Recommendations Found</h3>
+            <p>We couldn't find similar movies. Try searching for a different title.</p>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- ── Movie Not Found ────────────────────────────────────────── -->
+        <div class="no-results">
+            <span class="icon">🔍</span>
+            <h3>Movie Not Found</h3>
+            <p>We couldn't find "<strong>{{ request.form.get('movie_title', '') or request.args.get('movie_title', '') }}</strong>" in our database. Please try another title.</p>
+            <a href="/" class="btn btn-primary" style="margin-top: 24px;">← Back to Search</a>
+        </div>
+        {% endif %}
+
+    </main>
+
+    <!-- ── Footer ─────────────────────────────────────────────────────── -->
+    <footer class="footer">
+        <div class="container">
+            <p>🎬 CineMatch &middot; AI-Powered Movie Recommendations &middot; Built with Flask &amp; scikit-learn</p>
+            <p style="margin-top: 6px;">Made with <span class="heart">❤</span> using Content-Based Filtering</p>
+        </div>
+    </footer>
+
+</body>
+</html>
