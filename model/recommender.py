@@ -132,6 +132,116 @@ class MovieRecommender:
 
         return results
 
+    def get_profile_recommendations(self, movie_titles: list[str], n: int = 10) -> list[dict]:
+        """Return the top-*n* recommendation based on a list of profile/watchlist movie titles."""
+        if self.similarity_matrix is None:
+            self.build_model()
+
+        valid_indices = []
+        for title in movie_titles:
+            key = title.strip().lower()
+            idx = self._title_index.get(key)
+            if idx is not None:
+                valid_indices.append(idx)
+
+        if not valid_indices:
+            # Fall back to random featured movies if no valid profile items
+            return self.get_random_movies(n)
+
+        # Average similarity vector across all profile items
+        sum_sims = np.zeros(len(self.df))
+        for idx in valid_indices:
+            sum_sims += self.similarity_matrix[idx]
+        sum_sims /= len(valid_indices)
+
+        # Exclude the profile movies themselves from recommendation pool
+        for idx in valid_indices:
+            sum_sims[idx] = -1.0
+
+        # Sort and select top-n
+        top_indices = np.argsort(sum_sims)[::-1][:n]
+        
+        results = []
+        for other_idx in top_indices:
+            score = sum_sims[other_idx]
+            if score <= 0:
+                continue
+            row = self.df.iloc[other_idx]
+            results.append({
+                "title": row["title"],
+                "genres": row["genres"],
+                "director": row["director"],
+                "cast": row["cast"],
+                "overview": row["overview"],
+                "keywords": row["keywords"],
+                "rating": float(row["rating"]),
+                "year": int(row["year"]),
+                "similarity": round(float(score), 4),
+            })
+        return results
+
+    def get_recommendation_explanation(self, source_title: str, target_title: str) -> dict:
+        """Explain the relationship between the source and target movie."""
+        source = self.get_movie_details(source_title)
+        target = self.get_movie_details(target_title)
+        
+        if not source or not target:
+            return {"reasons": []}
+            
+        reasons = []
+        
+        # 1. Compare genres
+        source_genres = {g.strip().lower() for g in source["genres"].split(",") if g.strip()}
+        target_genres = {g.strip().lower() for g in target["genres"].split(",") if g.strip()}
+        shared_genres = source_genres.intersection(target_genres)
+        if shared_genres:
+            cased_genres = []
+            for g in target["genres"].split(","):
+                if g.strip().lower() in shared_genres:
+                    cased_genres.append(g.strip())
+            if cased_genres:
+                reasons.append(f"Similar genre: {', '.join(cased_genres[:2])}")
+                
+        # 2. Compare director
+        if source["director"] and target["director"] and source["director"].strip().lower() == target["director"].strip().lower():
+            reasons.append(f"Directed by {source['director']}")
+            
+        # 3. Compare cast
+        source_cast = {c.strip().lower() for c in source["cast"].split(",") if c.strip()}
+        target_cast = {c.strip().lower() for c in target["cast"].split(",") if c.strip()}
+        shared_cast = source_cast.intersection(target_cast)
+        if shared_cast:
+            cased_cast = []
+            for c in target["cast"].split(","):
+                if c.strip().lower() in shared_cast:
+                    cased_cast.append(c.strip())
+            if cased_cast:
+                reasons.append(f"Stars {cased_cast[0]}")
+                
+        # 4. Compare keywords
+        source_kws = {k.strip().lower() for k in source["keywords"].split(",") if k.strip()}
+        target_kws = {k.strip().lower() for k in target["keywords"].split(",") if k.strip()}
+        shared_kws = source_kws.intersection(target_kws)
+        if shared_kws:
+            cased_kws = []
+            for k in target["keywords"].split(","):
+                if k.strip().lower() in shared_kws:
+                    cased_kws.append(k.strip())
+            if cased_kws:
+                reasons.append(f"Similar themes: {', '.join(cased_kws[:2])}")
+                
+        # If no reasons, default to high similarity score
+        if not reasons:
+            reasons.append("Highly correlated storyline")
+            
+        return {
+            "shared_genres": list(shared_genres),
+            "same_director": source["director"] == target["director"] if source["director"] else False,
+            "shared_cast": list(shared_cast),
+            "shared_keywords": list(shared_kws),
+            "reasons": reasons
+        }
+
     # ── Accessors ─────────────────────────────────────────────────────────
 
     def get_all_movies(self) -> list[str]:
@@ -221,8 +331,8 @@ if __name__ == "__main__":
     rec.initialize()
 
     titles = rec.get_all_movies()
-    print(f"\n🎬 Total movies: {len(titles)}")
+    print(f"\nTotal movies: {len(titles)}")
     test_movie = titles[0]
-    print(f"\n🔍 Recommendations for '{test_movie}':\n")
+    print(f"\nRecommendations for '{test_movie}':\n")
     for r in rec.get_recommendations(test_movie, n=5):
-        print(f"  • {r['title']} ({r['year']}) – {r['similarity']*100:.1f}% match")
+        print(f"  - {r['title']} ({r['year']}) - {r['similarity']*100:.1f}% match")

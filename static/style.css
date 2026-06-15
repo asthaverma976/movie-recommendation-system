@@ -754,3 +754,507 @@ a:hover { color: var(--gold-light); }
 
   .search-section { margin-bottom: 40px; }
 }
+
+/* ── Enhanced UI Styles ────────────────────────────────────────────────── */
+
+/* Watchlist Bookmark Icon on Movie Cards */
+.watchlist-card-btn {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(10, 10, 18, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  z-index: 10;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.watchlist-card-btn:hover {
+  transform: scale(1.1);
+  color: var(--gold-light);
+  border-color: var(--gold);
+}
+
+.watchlist-card-btn.active {
+  color: var(--gold);
+  background: rgba(212, 168, 83, 0.15);
+  border-color: var(--gold);
+}
+
+/* Custom Watchlist Button in Detail Hero */
+.btn-watchlist-toggle {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--glass-border);
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all var(--transition-fast);
+}
+
+.btn-watchlist-toggle:hover {
+  border-color: var(--gold);
+  background: rgba(212, 168, 83, 0.08);
+}
+
+.btn-watchlist-toggle.active {
+  background: rgba(212, 168, 83, 0.12);
+  color: var(--gold-light);
+  border-color: var(--gold);
+}
+
+/* Advanced Filters Toggle Button */
+.filter-toggle-container {
+  display: flex;
+  justify-content: center;
+  margin-top: -30px;
+  margin-bottom: 40px;
+}
+
+.filter-toggle-btn {
+  background: rgba(22, 22, 38, 0.80);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  padding: 10px 24px;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all var(--transition-fast);
+  backdrop-filter: blur(8px);
+}
+
+.filter-toggle-btn:hover,
+.filter-toggle-btn.active {
+  color: var(--text-primary);
+  border-color: var(--gold);
+  background: rgba(212, 168, 83, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Collapsible Filter Panel */
+.filter-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--transition-med);
+  background: rgba(18, 18, 30, 0.50);
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(16px);
+  margin: -20px auto 40px;
+  max-width: 800px;
+}
+
+.filter-panel.open {
+  max-height: 500px;
+  border-color: var(--glass-border);
+  padding: 24px;
+  margin-bottom: 40px;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .filter-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .filter-panel.open {
+    max-height: 800px;
+  }
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.filter-group label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.filter-group input[type="text"],
+.filter-group select {
+  background: rgba(10, 10, 18, 0.6);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.filter-group select:focus {
+  border-color: var(--gold);
+}
+
+/* Genre Checkbox Grid */
+.genre-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  max-height: 120px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.genre-checkbox-grid::-webkit-scrollbar {
+  width: 4px;
+}
+.genre-checkbox-grid::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 2px;
+}
+
+.genre-check-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.genre-check-item input {
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+
+.genre-check-item:hover {
+  color: var(--text-primary);
+}
+
+/* Sliders range text */
+.slider-val {
+  font-size: 0.85rem;
+  color: var(--gold-light);
+  font-weight: 600;
+}
+
+.range-slider-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.range-slider-wrapper input[type="range"] {
+  accent-color: var(--gold);
+  background: var(--glass-border);
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Explanation Badges on Recommendation Cards */
+.explanation-container {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.explanation-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: var(--gold-light);
+  background: rgba(212, 168, 83, 0.08);
+  border: 1px dashed rgba(212, 168, 83, 0.25);
+  padding: 2px 8px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+/* User Reviews Section styling */
+.reviews-container {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  margin-top: 48px;
+  backdrop-filter: blur(12px);
+}
+
+.reviews-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 36px;
+}
+
+@media (max-width: 768px) {
+  .reviews-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .reviews-container {
+    padding: 24px;
+  }
+}
+
+.reviews-list-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 12px;
+}
+
+.reviews-list-column::-webkit-scrollbar {
+  width: 6px;
+}
+.reviews-list-column::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 3px;
+}
+
+.review-card-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.review-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.review-user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.review-avatar {
+  width: 28px;
+  height: 28px;
+  background: var(--purple-dark);
+  color: var(--text-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.review-username {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.review-rating-badge {
+  color: var(--gold);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.review-text-content {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.review-date-text {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  align-self: flex-end;
+}
+
+/* Reviews Form Column */
+.reviews-form-column {
+  border-left: 1px solid var(--glass-border);
+  padding-left: 36px;
+}
+
+@media (max-width: 768px) {
+  .reviews-form-column {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid var(--glass-border);
+    padding-top: 24px;
+  }
+}
+
+.review-form-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.review-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.review-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.review-input-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.review-input-group input[type="text"],
+.review-input-group textarea {
+  width: 100%;
+  background: rgba(10, 10, 18, 0.4);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  padding: 12px 16px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.review-input-group input[type="text"]:focus,
+.review-input-group textarea:focus {
+  border-color: var(--gold);
+  background: rgba(10, 10, 18, 0.6);
+}
+
+/* Stars Selection Input */
+.star-rating-select {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.star-rating-select input {
+  display: none;
+}
+
+.star-rating-select label {
+  font-size: 1.6rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.star-rating-select label:hover,
+.star-rating-select label:hover ~ label,
+.star-rating-select input:checked ~ label {
+  color: var(--gold);
+}
+
+/* Real Movie Poster Images */
+.poster-image-el {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  transition: transform var(--transition-slow);
+}
+
+.movie-card:hover .poster-image-el {
+  transform: scale(1.05);
+}
+
+.poster-overlay-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(10, 10, 18, 0.95) 0%, rgba(10, 10, 18, 0.6) 60%, transparent 100%);
+  padding: 16px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+/* Watchlist section specific styling on index page */
+.watchlist-section {
+  background: linear-gradient(180deg, rgba(22, 22, 38, 0.3) 0%, transparent 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  padding: 40px 0;
+}
+
+.horizontal-scroll-container {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 10px 0 24px;
+}
+
+.horizontal-scroll-container::-webkit-scrollbar {
+  height: 6px;
+}
+.horizontal-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.horizontal-scroll-container::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 3px;
+}
+
+.horizontal-scroll-container .movie-card {
+  min-width: 200px;
+  flex-shrink: 0;
+}
+
+/* Scroll indicator markers */
+.slider-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Profile rec block headers */
+.personal-recs-section {
+  padding: 40px 0;
+}
+

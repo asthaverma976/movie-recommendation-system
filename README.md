@@ -8,17 +8,18 @@ A content-based movie recommendation engine built with **Python**, **Flask**, an
 
 | Feature | Description |
 |---|---|
-| **Content-Based Filtering** | TF-IDF + cosine similarity on combined movie metadata |
-| **220+ Movies** | Diverse synthetic dataset spanning 10 genres (1990-2024) |
-| **Beautiful Web UI** | Premium cinematic dark theme with glassmorphism, animations, and gold accents |
+| **Content-Based Filtering** | TF-IDF + cosine similarity on combined movie metadata (genres, director, cast, keywords) |
+| **Personalized Recommendations** | Dynamic suggestions based on items in your active Watchlist |
+| **Advanced Filter & Sort** | Collapsible menu on the home page to filter by genres, release year range, min rating, and keywords; sort by Rating, Year, or Alphabetical |
+| **Similarity Match Explainer** | Dynamic badges explaining *why* each movie is suggested (e.g., matching genres, director, or cast) |
+| **Local Persistent DB (SQLite)** | Stores user watchlist, movie ratings, and reviews locally; falls back gracefully if MongoDB is disabled |
+| **User Reviews & Ratings** | Submit 1-10 star ratings and detailed reviews for any movie |
+| **High-Res Genre Posters** | Replaces generic emojis with beautiful, thematic cinematic photography from Unsplash |
 | **Autocomplete Search** | Real-time movie title suggestions as you type |
 | **Featured Grid** | Random movie showcase on the home page |
-| **Similarity Scores** | Visual percentage match for every recommendation |
-| **Star Ratings** | Five-star display for movie ratings |
-| **Genre Badges** | Color-coded genre tags |
 | **Model Persistence** | Save / load pre-computed similarity matrices with joblib |
 | **MongoDB (Optional)** | Log recommendations and store movies in MongoDB |
-| **REST API** | `/api/movies` endpoint for programmatic access |
+| **REST APIs** | endpoints for autocomplete and advanced filtering |
 
 ---
 
@@ -29,7 +30,7 @@ A content-based movie recommendation engine built with **Python**, **Flask**, an
 | **Backend**    | Python 3, Flask                               |
 | **ML**         | Scikit-learn (TF-IDF Vectorizer, Cosine Similarity) |
 | **Data**       | Pandas, NumPy                                 |
-| **Database**   | MongoDB via PyMongo (optional)                |
+| **Database**   | SQLite (Local persistent DB), MongoDB (Optional) |
 | **Frontend**   | HTML5, CSS3, Vanilla JavaScript               |
 | **Serialization** | Joblib                                     |
 
@@ -46,10 +47,12 @@ movie-recommendation-system/
 │   ├── generate_data.py        # Synthetic dataset generator
 │   └── movies.csv              # (generated) Movie dataset
 ├── database/
-│   └── mongo_handler.py        # MongoDB handler (optional)
+│   ├── mongo_handler.py        # MongoDB handler (optional)
+│   ├── sqlite_handler.py       # SQLite handler (local watchlist & reviews database)
+│   └── cinematch.db            # (generated) Local SQLite database
 ├── templates/
-│   ├── index.html              # Home / search page
-│   └── recommendations.html    # Results page
+│   ├── index.html              # Home / search page with filters and watchlist
+│   └── recommendations.html    # Results page with explanation badges and reviews
 ├── static/
 │   └── style.css               # Premium cinematic theme
 ├── requirements.txt
@@ -121,10 +124,14 @@ Tags -> TF-IDF Vectorizer -> Cosine Similarity Matrix -> Top-N Results
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/` | Home page with search and featured movies |
+| `GET` | `/` | Home page with search, featured, watchlist and personalized movies |
 | `POST` | `/recommend` | Get recommendations (form: `movie_title`) |
 | `GET` | `/recommend?movie_title=...` | Get recommendations (query param) |
-| `GET` | `/api/movies` | JSON list of all movie titles |
+| `POST` | `/watchlist/add` | Add a movie to the local watchlist |
+| `POST` | `/watchlist/remove` | Remove a movie from the local watchlist |
+| `POST` | `/review/add` | Submit a star rating & text comment for a movie |
+| `GET` | `/api/movies` | JSON list of all movie titles (for autocomplete) |
+| `GET` | `/api/movies/filter` | Search/filter/sort API (returns JSON list) |
 
 ---
 

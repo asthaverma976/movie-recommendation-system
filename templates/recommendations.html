@@ -34,18 +34,42 @@
 
         {% if movie %}
         <!-- ── Selected Movie Hero ────────────────────────────────────── -->
+        {% set primary_genre = movie.genres.split(',')[0].strip().lower() %}
+        {% if primary_genre == 'action' %}
+            {% set poster_url = 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=300&auto=format&fit=crop' %}
+        {% elif primary_genre == 'drama' %}
+            {% set poster_url = 'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=300&auto=format&fit=crop' %}
+        {% elif primary_genre == 'comedy' %}
+            {% set poster_url = 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?q=80&w=300&auto=format&fit=crop' %}
+        {% elif primary_genre == 'thriller' %}
+            {% set poster_url = 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=300&auto=format&fit=crop' %}
+        {% elif primary_genre == 'sci-fi' %}
+            {% set poster_url = 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=300&auto=format&fit=crop' %}
+        {% elif primary_genre == 'romance' %}
+            {% set poster_url = 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=300&auto=format&fit=crop' %}
+        {% elif primary_genre == 'horror' %}
+            {% set poster_url = 'https://images.unsplash.com/photo-1505635339363-3134459ab37a?q=80&w=300&auto=format&fit=crop' %}
+        {% elif primary_genre == 'animation' %}
+            {% set poster_url = 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=300&auto=format&fit=crop' %}
+        {% elif primary_genre == 'adventure' %}
+            {% set poster_url = 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=300&auto=format&fit=crop' %}
+        {% elif primary_genre == 'crime' %}
+            {% set poster_url = 'https://images.unsplash.com/photo-1453873531674-21511019041a?q=80&w=300&auto=format&fit=crop' %}
+        {% else %}
+            {% set poster_url = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=300&auto=format&fit=crop' %}
+        {% endif %}
         <div class="rec-hero">
             <div class="rec-hero-poster">
-                {% set primary_genre = movie.genres.split(',')[0].strip().lower().replace(' ', '-') %}
-                <div class="poster-gradient poster-{{ primary_genre }}">
-                    🎬
-                </div>
+                <img src="{{ poster_url }}" alt="{{ movie.title }}" style="width:100%; height:100%; object-fit:cover;">
             </div>
             <div class="rec-hero-info">
                 <h2>{{ movie.title }}</h2>
                 <div class="rec-hero-meta">
                     <span>📅 {{ movie.year }}</span>
-                    <span>⭐ {{ "%.1f" | format(movie.rating) }} / 10</span>
+                    <span>⭐ AI: {{ "%.1f" | format(movie.rating) }} / 10</span>
+                    {% if avg_user_rating %}
+                        <span class="rating-user" style="color: var(--gold-light); font-weight:600;">👥 User: ⭐ {{ "%.1f" | format(avg_user_rating) }} / 10</span>
+                    {% endif %}
                     <span class="director">🎬 {{ movie.director }}</span>
                 </div>
                 <div class="rec-hero-genres">
@@ -54,10 +78,16 @@
                     {% endfor %}
                 </div>
                 <p class="rec-hero-overview">{{ movie.overview }}</p>
-                <p class="rec-hero-cast"><strong>Cast:</strong> {{ movie.cast }}</p>
+                <p class="rec-hero-cast" style="margin-bottom: 24px;"><strong>Cast:</strong> {{ movie.cast }}</p>
+                
+                <!-- Watchlist Toggle Button -->
+                <button id="btn-watchlist" class="btn-watchlist-toggle {% if is_watchlisted %}active{% endif %}" onclick="toggleHeroWatchlist('{{ movie.title | e }}')">
+                    <span class="icon">{% if is_watchlisted %}❤️{% else %}🤍{% endif %}</span>
+                    <span class="text">{% if is_watchlisted %}In Watchlist{% else %}Add to Watchlist{% endif %}</span>
+                </button>
             </div>
         </div>
-
+ 
         <!-- ── Recommendations Grid ───────────────────────────────────── -->
         {% if recommendations %}
         <div class="section-header">
@@ -69,16 +99,39 @@
             <div class="movie-card fade-in-up" style="animation-delay: {{ loop.index0 * 0.06 }}s;" onclick="window.location.href='/recommend?movie_title={{ rec.title | urlencode }}'">
                 <!-- Similarity badge -->
                 <div class="similarity-badge">{{ "%.0f" | format(rec.similarity * 100) }}% match</div>
-
+ 
                 <!-- Poster -->
+                {% set rec_genre = rec.genres.split(',')[0].strip().lower() %}
+                {% if rec_genre == 'action' %}
+                    {% set rec_poster_url = 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=300&auto=format&fit=crop' %}
+                {% elif rec_genre == 'drama' %}
+                    {% set rec_poster_url = 'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=300&auto=format&fit=crop' %}
+                {% elif rec_genre == 'comedy' %}
+                    {% set rec_poster_url = 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?q=80&w=300&auto=format&fit=crop' %}
+                {% elif rec_genre == 'thriller' %}
+                    {% set rec_poster_url = 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=300&auto=format&fit=crop' %}
+                {% elif rec_genre == 'sci-fi' %}
+                    {% set rec_poster_url = 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=300&auto=format&fit=crop' %}
+                {% elif rec_genre == 'romance' %}
+                    {% set rec_poster_url = 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=300&auto=format&fit=crop' %}
+                {% elif rec_genre == 'horror' %}
+                    {% set rec_poster_url = 'https://images.unsplash.com/photo-1505635339363-3134459ab37a?q=80&w=300&auto=format&fit=crop' %}
+                {% elif rec_genre == 'animation' %}
+                    {% set rec_poster_url = 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=300&auto=format&fit=crop' %}
+                {% elif rec_genre == 'adventure' %}
+                    {% set rec_poster_url = 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=300&auto=format&fit=crop' %}
+                {% elif rec_genre == 'crime' %}
+                    {% set rec_poster_url = 'https://images.unsplash.com/photo-1453873531674-21511019041a?q=80&w=300&auto=format&fit=crop' %}
+                {% else %}
+                    {% set rec_poster_url = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=300&auto=format&fit=crop' %}
+                {% endif %}
                 <div class="movie-poster">
-                    {% set rec_genre = rec.genres.split(',')[0].strip().lower().replace(' ', '-') %}
-                    <div class="poster-gradient poster-{{ rec_genre }}">
-                        🎬
-                        <span class="poster-year">{{ rec.year }}</span>
+                    <img src="{{ rec_poster_url }}" alt="{{ rec.title }}" class="poster-image-el" loading="lazy">
+                    <div class="poster-overlay-info">
+                        <span class="poster-year" style="color: white; font-weight: 700; text-shadow: 1px 1px 4px rgba(0,0,0,0.8);">{{ rec.year }}</span>
                     </div>
                 </div>
-
+ 
                 <!-- Card body -->
                 <div class="movie-card-body">
                     <div class="movie-card-title">{{ rec.title }}</div>
@@ -103,17 +156,91 @@
                         </span>
                     </div>
                     <div class="movie-card-genres">
-                        {% for genre in rec.genres.split(',')[:3] %}
+                        {% for genre in rec.genres.split(',')[:2] %}
                         <span class="genre-badge {{ genre.strip().lower().replace(' ', '-') }}">{{ genre.strip() }}</span>
                         {% endfor %}
                     </div>
-                    <div style="margin-top: 8px; font-size: 0.78rem; color: var(--text-muted);">
-                        🎬 {{ rec.director }}
+                    <div style="margin-top: 8px; font-size: 0.78rem; color: var(--text-muted); display: flex; flex-direction:column; gap:6px;">
+                        <span>🎬 {{ rec.director }}</span>
+                        
+                        <!-- Similarity explanation badge -->
+                        {% if rec.explanation and rec.explanation.reasons %}
+                        <div class="explanation-container">
+                            {% for reason in rec.explanation.reasons[:1] %}
+                            <span class="explanation-badge">✨ {{ reason }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
+        
+        <!-- ── User Reviews Section ──────────────────────────────────────── -->
+        <div id="reviews-section" class="reviews-container">
+            <div class="reviews-grid">
+                <!-- Column 1: Reviews list -->
+                <div class="reviews-list-column">
+                    <h3 style="font-family: var(--font-display); margin-bottom: 20px;">💬 User Reviews</h3>
+                    {% if reviews %}
+                        {% for rev in reviews %}
+                        <div class="review-card-item">
+                            <div class="review-card-header">
+                                <div class="review-user-info">
+                                    <div class="review-avatar">
+                                        {{ rev.username[0] | upper if rev.username else 'A' }}
+                                    </div>
+                                    <span class="review-username">{{ rev.username }}</span>
+                                </div>
+                                <span class="review-rating-badge">⭐ {{ rev.rating }}/10</span>
+                            </div>
+                            <p class="review-text-content">{{ rev.review_text }}</p>
+                            <span class="review-date-text">{{ rev.created_at[:10] }}</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="text-align: center; padding: 60px 0; color: var(--text-muted);">
+                            <span style="font-size: 2.5rem; display:block; margin-bottom: 12px;">✍️</span>
+                            <h3>No reviews yet</h3>
+                            <p style="font-size: 0.85rem; margin-top: 4px;">Be the first to review "{{ movie.title }}".</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Column 2: Submission form -->
+                <div class="reviews-form-column">
+                    <h3 class="review-form-title">Write a Review</h3>
+                    <form action="/review/add" method="POST">
+                        <input type="hidden" name="movie_title" value="{{ movie.title }}">
+                        <div class="review-form-fields">
+                            <div class="review-input-group">
+                                <label for="review-username">Username</label>
+                                <input type="text" id="review-username" name="username" placeholder="e.g. Cinephile99" required>
+                            </div>
+
+                            <div class="review-input-group">
+                                <label>Your Rating</label>
+                                <div class="star-rating-select">
+                                    {% for i in range(10, 0, -1) %}
+                                    <input type="radio" id="star-{{ i }}" name="rating" value="{{ i }}" required>
+                                    <label for="star-{{ i }}" title="{{ i }} Stars">★</label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="review-input-group">
+                                <label for="review-text">Review Comments</label>
+                                <textarea id="review-text" name="review_text" rows="4" placeholder="What makes this film stand out?" required></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" style="margin-top: 8px; width:100%; justify-content:center;">Submit Review</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
         {% else %}
         <div class="no-results">
             <span class="icon">😔</span>
@@ -121,7 +248,7 @@
             <p>We couldn't find similar movies. Try searching for a different title.</p>
         </div>
         {% endif %}
-
+ 
         {% else %}
         <!-- ── Movie Not Found ────────────────────────────────────────── -->
         <div class="no-results">
@@ -131,9 +258,9 @@
             <a href="/" class="btn btn-primary" style="margin-top: 24px;">← Back to Search</a>
         </div>
         {% endif %}
-
+ 
     </main>
-
+ 
     <!-- ── Footer ─────────────────────────────────────────────────────── -->
     <footer class="footer">
         <div class="container">
@@ -142,5 +269,48 @@
         </div>
     </footer>
 
+    <script>
+        function toggleHeroWatchlist(title) {
+            const btn = document.getElementById('btn-watchlist');
+            const isActive = btn.classList.contains('active');
+            const url = isActive ? '/watchlist/remove' : '/watchlist/add';
+            
+            const formData = new FormData();
+            formData.append('movie_title', title);
+            
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    if (isActive) {
+                        btn.classList.remove('active');
+                        btn.querySelector('.icon').innerText = '🤍';
+                        btn.querySelector('.text').innerText = 'Add to Watchlist';
+                    } else {
+                        btn.classList.add('active');
+                        btn.querySelector('.icon').innerText = '❤️';
+                        btn.querySelector('.text').innerText = 'In Watchlist';
+                    }
+                } else {
+                    console.error('Failed to update watchlist status');
+                }
+            })
+            .catch(err => console.error('Error toggling watchlist:', err));
+        }
+
+        // Auto scroll to reviews container if submitted
+        {% if show_review_anchor %}
+        document.addEventListener("DOMContentLoaded", function() {
+            const target = document.getElementById("reviews-section");
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+        {% endif %}
+    </script>
+ 
 </body>
 </html>

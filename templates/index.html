@@ -54,6 +54,185 @@
         </div>
     </section>
 
+    <!-- ── Advanced Filters Toggle ─────────────────────────────────────── -->
+    <div class="filter-toggle-container">
+        <button id="filter-toggle" class="filter-toggle-btn">
+            <span>⚙️</span> Advanced Filters &amp; Sort
+        </button>
+    </div>
+
+    <!-- ── Advanced Filters Panel ──────────────────────────────────────── -->
+    <section id="filter-panel" class="filter-panel">
+        <form id="filter-form" onsubmit="event.preventDefault();">
+            <div class="filter-grid">
+                <!-- Genre checkboxes -->
+                <div class="filter-group">
+                    <label>Filter by Genre</label>
+                    <div class="genre-checkbox-grid">
+                        {% for genre in ['Action', 'Drama', 'Comedy', 'Thriller', 'Sci-Fi', 'Romance', 'Horror', 'Animation', 'Adventure', 'Crime'] %}
+                        <label class="genre-check-item">
+                            <input type="checkbox" class="genre-cb" value="{{ genre }}">
+                            <span>{{ genre }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Sliders -->
+                <div class="filter-group">
+                    <label>Release Year (from <span id="start-year-val" class="slider-val">1990</span>)</label>
+                    <div class="range-slider-wrapper">
+                        <input type="range" id="filter-start-year" min="1990" max="2026" value="1990">
+                    </div>
+                    
+                    <label style="margin-top: 14px;">Minimum Rating (⭐ <span id="min-rating-val" class="slider-val">0.0</span>)</label>
+                    <div class="range-slider-wrapper">
+                        <input type="range" id="filter-min-rating" min="0" max="10" step="0.5" value="0">
+                    </div>
+                </div>
+
+                <!-- Query search and Sort -->
+                <div class="filter-group">
+                    <label>Sort Results By</label>
+                    <select id="filter-sort">
+                        <option value="rating">Highest Rated</option>
+                        <option value="year">Newest First</option>
+                        <option value="title">Alphabetical</option>
+                    </select>
+
+                    <label style="margin-top: 14px;">Keyword / Cast / Director</label>
+                    <input type="text" id="filter-query" placeholder="Search cast, director, theme…">
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <!-- ── Watchlist Section ──────────────────────────────────────────── -->
+    {% if watchlist %}
+    <section class="watchlist-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title"><span class="icon">❤️</span> My Watchlist</h2>
+                <span class="section-subtitle">{{ watchlist | length }} movies saved</span>
+            </div>
+            <div class="horizontal-scroll-container">
+                {% for movie in watchlist %}
+                {% set primary_genre = movie.genres.split(',')[0].strip().lower() %}
+                {% if primary_genre == 'action' %}
+                    {% set poster_url = 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=300&auto=format&fit=crop' %}
+                {% elif primary_genre == 'drama' %}
+                    {% set poster_url = 'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=300&auto=format&fit=crop' %}
+                {% elif primary_genre == 'comedy' %}
+                    {% set poster_url = 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?q=80&w=300&auto=format&fit=crop' %}
+                {% elif primary_genre == 'thriller' %}
+                    {% set poster_url = 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=300&auto=format&fit=crop' %}
+                {% elif primary_genre == 'sci-fi' %}
+                    {% set poster_url = 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=300&auto=format&fit=crop' %}
+                {% elif primary_genre == 'romance' %}
+                    {% set poster_url = 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=300&auto=format&fit=crop' %}
+                {% elif primary_genre == 'horror' %}
+                    {% set poster_url = 'https://images.unsplash.com/photo-1505635339363-3134459ab37a?q=80&w=300&auto=format&fit=crop' %}
+                {% elif primary_genre == 'animation' %}
+                    {% set poster_url = 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=300&auto=format&fit=crop' %}
+                {% elif primary_genre == 'adventure' %}
+                    {% set poster_url = 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=300&auto=format&fit=crop' %}
+                {% elif primary_genre == 'crime' %}
+                    {% set poster_url = 'https://images.unsplash.com/photo-1453873531674-21511019041a?q=80&w=300&auto=format&fit=crop' %}
+                {% else %}
+                    {% set poster_url = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=300&auto=format&fit=crop' %}
+                {% endif %}
+                <div class="movie-card" onclick="selectMovie('{{ movie.title | e }}')" title="Get recommendations for {{ movie.title | e }}">
+                    <div class="watchlist-card-btn active" onclick="toggleWatchlist(event, '{{ movie.title | e }}', this)" title="Remove from Watchlist">❤️</div>
+                    <div class="movie-poster">
+                        <img src="{{ poster_url }}" alt="{{ movie.title }}" class="poster-image-el" loading="lazy">
+                        <div class="poster-overlay-info">
+                            <span class="poster-year" style="color: white; font-weight: 700; text-shadow: 1px 1px 4px rgba(0,0,0,0.8);">{{ movie.year }}</span>
+                        </div>
+                    </div>
+                    <div class="movie-card-body">
+                        <div class="movie-card-title">{{ movie.title }}</div>
+                        <div class="movie-card-meta">
+                            <span class="year">{{ movie.year }}</span>
+                            <span class="rating">⭐ {{ "%.1f" | format(movie.rating) }}</span>
+                        </div>
+                        <div class="movie-card-genres">
+                            {% for genre in movie.genres.split(',')[:2] %}
+                            <span class="genre-badge {{ genre.strip().lower().replace(' ', '-') }}">{{ genre.strip() }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- ── Recommended For You (Personalised watchlist recommendations) ───── -->
+    {% if personalized_recs %}
+    <section class="personal-recs-section container">
+        <div class="section-header">
+            <h2 class="section-title"><span class="icon">✨</span> Recommended For You</h2>
+            <span class="section-subtitle">Personalised suggestions based on your watchlist</span>
+        </div>
+        <div class="movie-grid">
+            {% for movie in personalized_recs %}
+            {% set primary_genre = movie.genres.split(',')[0].strip().lower() %}
+            {% if primary_genre == 'action' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'drama' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'comedy' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'thriller' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'sci-fi' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'romance' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'horror' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1505635339363-3134459ab37a?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'animation' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'adventure' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'crime' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1453873531674-21511019041a?q=80&w=300&auto=format&fit=crop' %}
+            {% else %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=300&auto=format&fit=crop' %}
+            {% endif %}
+            <div class="movie-card" onclick="selectMovie('{{ movie.title | e }}')" title="Get recommendations for {{ movie.title | e }}">
+                {% set in_wl = False %}
+                {% for w_item in watchlist %}
+                    {% if w_item.title.lower() == movie.title.lower() %}
+                        {% set in_wl = True %}
+                    {% endif %}
+                {% endfor %}
+                <div class="watchlist-card-btn {% if in_wl %}active{% endif %}" onclick="toggleWatchlist(event, '{{ movie.title | e }}', this)" title="{% if in_wl %}Remove from Watchlist{% else %}Add to Watchlist{% endif %}">{% if in_wl %}❤️{% else %}🤍{% endif %}</div>
+                <div class="movie-poster">
+                    <img src="{{ poster_url }}" alt="{{ movie.title }}" class="poster-image-el" loading="lazy">
+                    <div class="poster-overlay-info">
+                        <span class="poster-year" style="color: white; font-weight: 700; text-shadow: 1px 1px 4px rgba(0,0,0,0.8);">{{ movie.year }}</span>
+                    </div>
+                </div>
+                <div class="movie-card-body">
+                    <div class="movie-card-title">{{ movie.title }}</div>
+                    <div class="movie-card-meta">
+                        <span class="year">{{ movie.year }}</span>
+                        <span class="rating">⭐ {{ "%.1f" | format(movie.rating) }}</span>
+                    </div>
+                    <div class="movie-card-genres">
+                        {% for genre in movie.genres.split(',')[:2] %}
+                        <span class="genre-badge {{ genre.strip().lower().replace(' ', '-') }}">{{ genre.strip() }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
     <!-- ── Featured Movies ────────────────────────────────────────────── -->
     <section id="featured" class="container">
         <div class="section-header">
@@ -62,11 +241,42 @@
         </div>
         <div class="movie-grid" id="featured-grid">
             {% for movie in featured_movies %}
+            {% set primary_genre = movie.genres.split(',')[0].strip().lower() %}
+            {% if primary_genre == 'action' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'drama' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'comedy' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'thriller' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'sci-fi' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'romance' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'horror' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1505635339363-3134459ab37a?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'animation' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'adventure' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=300&auto=format&fit=crop' %}
+            {% elif primary_genre == 'crime' %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1453873531674-21511019041a?q=80&w=300&auto=format&fit=crop' %}
+            {% else %}
+                {% set poster_url = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=300&auto=format&fit=crop' %}
+            {% endif %}
             <div class="movie-card" onclick="selectMovie('{{ movie.title | e }}')" title="Get recommendations for {{ movie.title | e }}">
+                {% set in_wl = False %}
+                {% for w_item in watchlist %}
+                    {% if w_item.title.lower() == movie.title.lower() %}
+                        {% set in_wl = True %}
+                    {% endif %}
+                {% endfor %}
+                <div class="watchlist-card-btn {% if in_wl %}active{% endif %}" onclick="toggleWatchlist(event, '{{ movie.title | e }}', this)" title="{% if in_wl %}Remove from Watchlist{% else %}Add to Watchlist{% endif %}">{% if in_wl %}❤️{% else %}🤍{% endif %}</div>
                 <div class="movie-poster">
-                    <div class="poster-gradient {{ movie.genres.split(',')[0].strip().lower().replace('-', '-') | default('default') | replace('sci-fi','sci-fi') }} poster-{{ movie.genres.split(',')[0].strip().lower().replace(' ', '-') | default('default') }}">
-                        🎬
-                        <span class="poster-year">{{ movie.year }}</span>
+                    <img src="{{ poster_url }}" alt="{{ movie.title }}" class="poster-image-el" loading="lazy">
+                    <div class="poster-overlay-info">
+                        <span class="poster-year" style="color: white; font-weight: 700; text-shadow: 1px 1px 4px rgba(0,0,0,0.8);">{{ movie.year }}</span>
                     </div>
                 </div>
                 <div class="movie-card-body">
@@ -96,6 +306,28 @@
 
     <!-- ── Scripts ────────────────────────────────────────────────────── -->
     <script>
+        // Set up active watchlist set for UI state matching
+        const watchlistTitles = new Set([
+            {% for m in watchlist %}
+            "{{ m.title | replace('"', '\\"') | safe }}".toLowerCase(),
+            {% endfor %}
+        ]);
+
+        // Stable poster URLs mapped by genre
+        const GENRE_POSTERS = {
+            'action': 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=300&auto=format&fit=crop',
+            'drama': 'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=300&auto=format&fit=crop',
+            'comedy': 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?q=80&w=300&auto=format&fit=crop',
+            'thriller': 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=300&auto=format&fit=crop',
+            'sci-fi': 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=300&auto=format&fit=crop',
+            'romance': 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=300&auto=format&fit=crop',
+            'horror': 'https://images.unsplash.com/photo-1505635339363-3134459ab37a?q=80&w=300&auto=format&fit=crop',
+            'animation': 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=300&auto=format&fit=crop',
+            'adventure': 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=300&auto=format&fit=crop',
+            'crime': 'https://images.unsplash.com/photo-1453873531674-21511019041a?q=80&w=300&auto=format&fit=crop',
+            'default': 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=300&auto=format&fit=crop'
+        };
+
         // ── Movie data from server ──────────────────────────────────────
         let allMovies = [];
 
@@ -176,6 +408,157 @@
         function selectMovie(title) {
             searchInput.value = title;
             recommendForm.submit();
+        }
+
+        // ── Watchlist Operations ─────────────────────────────────────────
+        function toggleWatchlist(event, title, element) {
+            event.stopPropagation();
+            
+            const isActive = element.classList.contains('active');
+            const url = isActive ? '/watchlist/remove' : '/watchlist/add';
+            
+            const formData = new FormData();
+            formData.append('movie_title', title);
+            
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    if (isActive) {
+                        element.classList.remove('active');
+                        element.innerText = '🤍';
+                        element.title = 'Add to Watchlist';
+                        watchlistTitles.delete(title.toLowerCase());
+                    } else {
+                        element.classList.add('active');
+                        element.innerText = '❤️';
+                        element.title = 'Remove from Watchlist';
+                        watchlistTitles.add(title.toLowerCase());
+                    }
+                    // Optional: reload page to update Watchlist sections if on home page
+                    setTimeout(() => window.location.reload(), 300);
+                } else {
+                    console.error('Failed to update watchlist status');
+                }
+            })
+            .catch(err => console.error('Error toggling watchlist:', err));
+        }
+
+        // ── Filters & Search Toggle ──────────────────────────────────────
+        const filterToggle = document.getElementById('filter-toggle');
+        const filterPanel  = document.getElementById('filter-panel');
+        
+        filterToggle.addEventListener('click', () => {
+            const isOpen = filterPanel.classList.toggle('open');
+            filterToggle.classList.toggle('active', isOpen);
+        });
+
+        // Range Sliders listeners
+        const startYearInput = document.getElementById('filter-start-year');
+        const startYearVal   = document.getElementById('start-year-val');
+        const minRatingInput = document.getElementById('filter-min-rating');
+        const minRatingVal   = document.getElementById('min-rating-val');
+
+        startYearInput.addEventListener('input', function() {
+            startYearVal.textContent = this.value;
+            triggerFilters();
+        });
+        
+        minRatingInput.addEventListener('input', function() {
+            minRatingVal.textContent = parseFloat(this.value).toFixed(1);
+            triggerFilters();
+        });
+
+        // Filters form control listeners
+        document.querySelectorAll('.genre-cb').forEach(cb => {
+            cb.addEventListener('change', triggerFilters);
+        });
+        document.getElementById('filter-sort').addEventListener('change', triggerFilters);
+        
+        // Debounce query search
+        let searchTimeout;
+        document.getElementById('filter-query').addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(triggerFilters, 350);
+        });
+
+        function triggerFilters() {
+            const selectedGenres = Array.from(document.querySelectorAll('.genre-cb:checked')).map(cb => cb.value).join(',');
+            const startYear = startYearInput.value;
+            const minRating = minRatingInput.value;
+            const sortBy = document.getElementById('filter-sort').value;
+            const query = document.getElementById('filter-query').value.trim();
+
+            const params = new URLSearchParams({
+                genres: selectedGenres,
+                start_year: startYear,
+                min_rating: minRating,
+                sort_by: sortBy,
+                query: query
+            });
+
+            fetch(`/api/movies/filter?${params.toString()}`)
+                .then(res => res.json())
+                .then(data => {
+                    renderMovieGrid(data.movies);
+                })
+                .catch(err => console.error('Error filtering movies:', err));
+        }
+
+        function renderMovieGrid(movies) {
+            const grid = document.getElementById('featured-grid');
+            
+            if (!movies || movies.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-results" style="grid-column: 1 / -1;">
+                        <span class="icon">🔍</span>
+                        <h3>No Movies Match Your Filters</h3>
+                        <p>Try widening your search criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = movies.map((movie, index) => {
+                const genresList = movie.genres.split(',').map(g => g.trim());
+                const primaryGenre = genresList[0].toLowerCase();
+                const posterUrl = GENRE_POSTERS[primaryGenre] || GENRE_POSTERS['default'];
+                const isWatchlisted = watchlistTitles.has(movie.title.toLowerCase());
+
+                const genreBadges = genresList.slice(0, 2).map(genre => {
+                    const sanitisedGenre = genre.toLowerCase().replace(' ', '-');
+                    return `<span class="genre-badge ${sanitisedGenre}">${genre}</span>`;
+                }).join('');
+
+                const ratingVal = parseFloat(movie.rating).toFixed(1);
+
+                return `
+                    <div class="movie-card fade-in-up" style="animation-delay: ${index * 0.03}s;" onclick="selectMovie('${escapeHtml(movie.title)}')" title="Get recommendations for ${escapeHtml(movie.title)}">
+                        <div class="watchlist-card-btn ${isWatchlisted ? 'active' : ''}" onclick="toggleWatchlist(event, '${escapeHtml(movie.title)}', this)" title="${isWatchlisted ? 'Remove from Watchlist' : 'Add to Watchlist'}">
+                            ${isWatchlisted ? '❤️' : '🤍'}
+                        </div>
+                        <div class="movie-poster">
+                            <img src="${posterUrl}" alt="${escapeHtml(movie.title)}" class="poster-image-el" loading="lazy">
+                            <div class="poster-overlay-info">
+                                <span class="poster-year" style="color: white; font-weight: 700; text-shadow: 1px 1px 4px rgba(0,0,0,0.8);">${movie.year}</span>
+                            </div>
+                        </div>
+                        <div class="movie-card-body">
+                            <div class="movie-card-title">${escapeHtml(movie.title)}</div>
+                            <div class="movie-card-meta">
+                                <span class="year">${movie.year}</span>
+                                <span class="rating">⭐ ${ratingVal}</span>
+                            </div>
+                            <div class="movie-card-genres">
+                                ${genreBadges}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         // ── Helpers ─────────────────────────────────────────────────────
